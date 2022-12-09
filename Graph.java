@@ -2,10 +2,18 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
 
+/**
+ * This class represents an undirected graph
+ */
 public class Graph implements GraphADT {
     private Node[] nodes;
     private Edge[][] adjacency;
 
+    /**
+     *  Creates a graph with n nodes and no edges. This is the constructor for the
+     * class. The ids of the nodes are n−1 <-- This does not actually happen. The nodes both in the tests and during BFS are all zero indexed and don't require using n-1.
+     * @param n
+     */
     public Graph(int n) {
         nodes = new Node[n];
 
@@ -18,6 +26,15 @@ public class Graph implements GraphADT {
         }
     }
 
+    /**
+     * Adds an edge of the given type connecting
+     * u and v. This method throws a GraphException if either node does not exist or if in the
+     * graph there is already an edge connecting the given nodes.
+     * @param u First node.
+     * @param v Second node.
+     * @param type type of road
+     * @throws GraphException
+     */
     public void addEdge(Node u, Node v, String type) throws GraphException {
         if (u.getId() >= 0 && u.getId() < adjacency.length && v.getId() >= 0 && v.getId() < adjacency.length) {
             if (adjacency[u.getId()][v.getId()] == null && adjacency[v.getId()][u.getId()] == null) {
@@ -35,6 +52,13 @@ public class Graph implements GraphADT {
         throw new GraphException("Node invalid");
     }
 
+    /**
+     *  the node with the specified id.
+     * @param id
+     * @return the node with the id
+     * @throws GraphException If no node with this id
+     * exists, the method should throw a GraphException
+     */
     @Override
     public Node getNode(int id) throws GraphException {
         if (nodes.length <= id || 0 > id) {
@@ -50,7 +74,14 @@ public class Graph implements GraphADT {
         return node;
     }
 
-    //**THE DOCUMENTATION SHOULD NOT BE USING RAW ITERATOR, IT IS PRACTICALLY NOT USABLE IN A RAW STATE**
+    //**THE DOCUMENTATION SHOULD NOT BE USING RAW ITERATOR, IT IS PRACTICALLY NOT USABLE IN A RAW STATE**//
+    /**
+     * Returns a Java Iterator storing all the edges incident
+     * on node u. It returns null if u does not have any edges incident on it.
+     * @param u the node
+     * @return the roads that connect to it as in iterator.
+     * @throws GraphException
+     */
     @Override
     public Iterator incidentEdges(Node u) throws GraphException {
         if (u.getId() >= 0 && u.getId() < adjacency.length) {
@@ -62,6 +93,14 @@ public class Graph implements GraphADT {
         throw new GraphException("Invalid Node");
     }
 
+    /**
+     * Returns the edge connecting nodes u and v. This method
+     * throws a GraphException if there is no edge between u and v.
+     * @param u First node
+     * @param v Second node
+     * @return The connecting road otherwise known as 'edge'.
+     * @throws GraphException
+     */
     @Override
     public Edge getEdge(Node u, Node v) throws GraphException {
         if (nodes[u.getId()] != u) {
@@ -80,6 +119,14 @@ public class Graph implements GraphADT {
         return edge;
     }
 
+    /**
+     * Returns true if nodes u and v are adjacent; it
+     * returns false otherwise.
+     * @param u The first node
+     * @param v The second node
+     * @return True of the nodes are adjacent!
+     * @throws GraphException
+     */
     @Override
     public boolean areAdjacent(Node u, Node v) throws GraphException {
         if (nodes.length <= u.getId() || 0 > u.getId()) {

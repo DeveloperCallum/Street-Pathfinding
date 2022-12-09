@@ -1,13 +1,11 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
+/**
+ * Processing class for the Depth First Search!
+ */
 public class MyMap {
-
-
     private Graph map;
     private int startNode, endNode;
     private int mapWidth;
@@ -19,7 +17,14 @@ public class MyMap {
     private final static String PR = "private";
     private final static String CO = "construction";
 
-    //TODO FIX
+    /**
+     *  Constructor for building a graph from the input file specified
+     * in the parameter; this graph represents the roadmap. If the input file does not exist, this
+     * method should throw a MapException.
+     * @param path input file
+     * @throws MapException
+     */
+
     public MyMap(String path) throws MapException {
         if (path == null || path.isBlank()) {
             throw new MapException("Nap cannot be null!");
@@ -64,26 +69,54 @@ public class MyMap {
         }
     }
 
+    /**
+     * @return the graph representing the roadmap.
+     */
     public Graph getGraph() {
         return map;
     }
 
+    /**
+     * @return the id of the starting node (this value and the next three
+     * values are specified in the input file).
+     */
     public int getStartingNode() {
         return startNode;
     }
 
+    /**
+     * @return the id of the destination node.
+     */
     public int getDestinationNode() {
         return endNode;
     }
 
+    /**
+     * @return the maximum number allowed of private roads in the path
+     * from the starting node to the destination.
+     */
     public int maxPrivateRoads() {
         return numPrivate;
     }
 
+    /**
+     * @return the maximum number allowed of construction roads
+     * in the path from the starting node to the destination.
+     */
     public int maxConstructionRoads() {
         return numConstruction;
     }
 
+    /**
+     *  a Java Iterator containing the nodes of a path from the start node to the destination
+     * node such that the path uses at most maxPrivate private roads and maxConstruction construction roads, if such a path exists. If the path does not exist, this method returns the value
+     * null.
+     * @param start The starting node.
+     * @param destination The end node.
+     * @param maxPrivate The limit of private roads.
+     * @param maxConstruction The limit of construction roads.
+     * @return
+     */
     public Iterator findPath(int start, int destination, int maxPrivate, int maxConstruction) {
 
         Node nodeStart;
@@ -94,22 +127,24 @@ public class MyMap {
             Node endNode = getGraph().getNode(destination);
 
             Node[] pass = new Node[numNodes];
-            Node[] data = DFS(0,pass, nodeStart, endNode, maxPrivate, maxConstruction, 0, 0);
 
-            if (data == null){
+            List<Node> data = DFS(0,new LinkedList<>(), nodeStart, endNode, maxPrivate, maxConstruction, 0, 0);
+
+            if (data == null || data.isEmpty()){
                 return null;
             }
 
-            return Arrays.stream(data).filter(Objects::nonNull).iterator();
+            return data.iterator();
         } catch (GraphException e) {
             throw new RuntimeException(e);
         }
     }
 
-    //Everytime a new node gets tested add it to the returned stack. If DFS does not return NULL consider that the path
-    public Node[] DFS(int step, Node[] path, Node current, Node end, int maxPrivate, int maxConstruction, int currentPri, int currentCon) throws GraphException {
-        current.markNode(true); //The node has been visited!
-        path[step] = current;
+    //The algorithm for finding a path. The code does not use the nodes' marking methods.
+    // This was because it was easier just to use the path to decide if a node was visited or not and makes for robust, modular and more readable code.
+    //In theory this would use less memory as only the visited nodes have an entry, but since getMarked is required it is still present.
+    public List<Node> DFS(int step, List<Node> path, Node current, Node end, int maxPrivate, int maxConstruction, int currentPri, int currentCon) throws GraphException {
+        path.add(current);
 
         if (current.getId() == end.getId()) {
             return path;
@@ -121,7 +156,7 @@ public class MyMap {
             Edge e = process.next();
             Node next = e.secondNode();
 
-            if (next.getMark()) {
+            if (path.contains(next)) {
                 continue;
             }
 
@@ -142,18 +177,20 @@ public class MyMap {
                 continue;
             }
 
-            Node[] data = DFS(step + 1, path, next, end, maxPrivate, maxConstruction, tempPri, tempCon);
+            List<Node> data = DFS(step + 1, path, next, end, maxPrivate, maxConstruction, tempPri, tempCon);
 
             if (data != null) {
                 return data;
             }
-
         }
 
-        path[step] = null;
+        path.remove(current);
         return null;
     }
 
+    //Create the grid, the documentation for this is unnecessarily complex, confusing and does not explain how to read the inputs very well; it also reuses the value 'B'
+    // " R can be any of the following characters: ’+’ or ’B’. H could be ’B’, ’V’, ’C’, or ’P’ " this makes this explanation meaningless.
+    //It would have been better to state that the + are the nodes and around the node you have the type of 'road' that connects it.
     private void processNodes(String[] data) throws GraphException {
         int nodeR = 0;
         int nodeC = 0;
@@ -198,6 +235,7 @@ public class MyMap {
         }
     }
 
+    //Gets the type of road the edge has.
     private String getRoadType(char type) {
         String roadType = type == 'P' ? PU : type == 'V' ? PR : type == 'C' ? CO : null;
         return roadType;
