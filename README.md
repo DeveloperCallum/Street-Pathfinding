@@ -250,3 +250,10 @@ produced by the algorithm is: 0, 1, 5, 6, and 10.
 
 **You do not have to implement the above algorithm if you do not want to. Feel free to
 design your own solution for the problem.**
+
+# Code  Provided
+
+The following files: `TestGraph.java`, `DrawMap.java`,
+`Board.java`, `Path.java`, `GraphADT.java`, `GraphException,java`, `MapException.java`, and several image files were provided by the assignment.
+
+The main method is in the class `Path.java`.
